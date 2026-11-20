@@ -12,7 +12,7 @@ export async function GET(request: Request) {
     if (!sessionId || !/^[A-Za-z0-9_-]{8,64}$/.test(sessionId)) {
       return json({ messages: [] });
     }
-    const db = getDb();
+    const db = await getDb();
     const conversation = getConversation(db, sessionId);
     if (!conversation) return json({ messages: [] });
     const messages = getMessages(db, sessionId, 100)

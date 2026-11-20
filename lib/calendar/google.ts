@@ -23,7 +23,7 @@ export type StoredGoogleToken = {
   expiry_date?: number | null;
 };
 
-const TOKEN_PATH = path.join(process.cwd(), "data", "google-token.json");
+const TOKEN_PATH = path.join(process.env.LUMA_DATA_DIR || path.join(process.cwd(), "data"), "google-token.json");
 
 export function isGoogleConfigured(): boolean {
   return Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);

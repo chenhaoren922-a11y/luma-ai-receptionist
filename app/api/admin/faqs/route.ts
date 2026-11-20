@@ -39,7 +39,7 @@ function readFaqInput(body: unknown): FaqInput {
 export async function GET(request: Request) {
   try {
     requireAdmin(request);
-    return json({ faqs: getFaqs(getDb(), false) });
+    return json({ faqs: getFaqs(await getDb(), false) });
   } catch (error) {
     return routeError(error);
   }
@@ -48,7 +48,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     requireAdmin(request);
-    const db = getDb();
+    const db = await getDb();
     const body = await readJson(request);
     return json({ faq: createFaq(db, readFaqInput(body)) }, { status: 201 });
   } catch (error) {
@@ -59,7 +59,7 @@ export async function POST(request: Request) {
 export async function PATCH(request: Request) {
   try {
     requireAdmin(request);
-    const db = getDb();
+    const db = await getDb();
     const body = await readJson(request);
     const id = stringField(body, "id", { required: true, max: 100 });
     if (!id) throw new AppError("MISSING_ID", "FAQ id is required.");
@@ -75,7 +75,7 @@ export async function DELETE(request: Request) {
     const body = await readJson(request);
     const id = stringField(body, "id", { required: true, max: 100 });
     if (!id) throw new AppError("MISSING_ID", "FAQ id is required.");
-    deleteFaq(getDb(), id);
+    deleteFaq(await getDb(), id);
     return json({ ok: true });
   } catch (error) {
     return routeError(error);

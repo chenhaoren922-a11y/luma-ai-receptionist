@@ -1,12 +1,11 @@
 import type { Db } from "@/lib/db/client";
-import { getDb } from "@/lib/db/client";
 import { getServices, getStaff } from "@/lib/data/catalog";
 import { getSettings } from "@/lib/data/settings";
 import { calendarStatus } from "@/lib/calendar/google";
 import { modelStatus } from "@/lib/ai/provider";
 import type { BootstrapResponse, ServiceSummary, StaffSummary } from "@/lib/types";
 
-export function getBootstrap(db: Db = getDb()): BootstrapResponse {
+export function getBootstrap(db: Db): BootstrapResponse {
   const settings = getSettings(db);
   const services: ServiceSummary[] = getServices(db).map((service) => ({
     id: service.id,

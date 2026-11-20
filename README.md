@@ -24,9 +24,13 @@ An English, responsive AI receptionist for a multi-service studio. Customers can
 - `chrono-node` for natural-language dates, `date-fns-tz` for time zones
 - Vitest for domain and booking tests
 
+## Bolt
+
+See [Bolt setup](docs/bolt.md) for a self-contained preview and a production deployment with persistent bookings.
+
 ## Quick start
 
-Requirements: Node.js 20.9+ (tested with Node 24.21), npm.
+Requirements: Node.js 22.13+ or 24 (tested with Node 24.21), npm.
 
 ```powershell
 Copy-Item .env.example .env.local

@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     const code = stringField(body, "code", { required: true, max: 40 });
     const phone = stringField(body, "phone", { required: true, max: 30 });
     const conversationId = stringField(body, "conversationId", { max: 64 });
-    const db = getDb();
+    const db = await getDb();
     const settings = getSettings(db);
     const provider = await getGoogleCalendarProvider(db);
     const result = await cancelAppointment(db, {

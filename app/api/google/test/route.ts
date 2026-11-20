@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 export async function POST(request: Request) {
   try {
     requireAdmin(request);
-    const provider = await getGoogleCalendarProvider(getDb());
+    const provider = await getGoogleCalendarProvider(await getDb());
     if (!provider) {
       throw new AppError(
         "CALENDAR_NOT_CONNECTED",

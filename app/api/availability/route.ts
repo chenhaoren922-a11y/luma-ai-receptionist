@@ -28,7 +28,7 @@ export async function GET(request: Request) {
       throw new AppError("INVALID_PERIOD", "period must be morning, afternoon, or evening.");
     }
 
-    const db = getDb();
+    const db = await getDb();
     const provider = await getGoogleCalendarProvider(db);
     const result = await getAvailability(db, {
       serviceId,

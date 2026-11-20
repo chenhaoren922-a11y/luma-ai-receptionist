@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 export async function POST(request: Request) {
   try {
     requireAdmin(request);
-    const db = getDb();
+    const db = await getDb();
     const provider = await getGoogleCalendarProvider(db);
     if (!provider) {
       throw new AppError(

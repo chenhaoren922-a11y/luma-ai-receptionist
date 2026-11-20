@@ -36,7 +36,7 @@ function readStaffInput(body: unknown): StaffInput {
 export async function GET(request: Request) {
   try {
     requireAdmin(request);
-    const db = getDb();
+    const db = await getDb();
     return json({ staff: getStaff(db, false), services: getServices(db, false) });
   } catch (error) {
     return routeError(error);
@@ -46,7 +46,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     requireAdmin(request);
-    const db = getDb();
+    const db = await getDb();
     const body = await readJson(request);
     return json({ staff: createStaff(db, readStaffInput(body)) }, { status: 201 });
   } catch (error) {
@@ -57,7 +57,7 @@ export async function POST(request: Request) {
 export async function PATCH(request: Request) {
   try {
     requireAdmin(request);
-    const db = getDb();
+    const db = await getDb();
     const body = await readJson(request);
     const id = stringField(body, "id", { required: true, max: 100 });
     if (!id) throw new AppError("MISSING_ID", "Team member id is required.");
@@ -73,7 +73,7 @@ export async function DELETE(request: Request) {
     const body = await readJson(request);
     const id = stringField(body, "id", { required: true, max: 100 });
     if (!id) throw new AppError("MISSING_ID", "Team member id is required.");
-    deactivateStaff(getDb(), id);
+    deactivateStaff(await getDb(), id);
     return json({ ok: true });
   } catch (error) {
     return routeError(error);

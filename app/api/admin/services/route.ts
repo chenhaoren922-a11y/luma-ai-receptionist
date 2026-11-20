@@ -43,7 +43,7 @@ function readServiceInput(body: unknown, fallbackCurrency: string): ServiceInput
 export async function GET(request: Request) {
   try {
     requireAdmin(request);
-    const db = getDb();
+    const db = await getDb();
     return json({ services: getServices(db, false), staff: getStaff(db, false) });
   } catch (error) {
     return routeError(error);
@@ -53,7 +53,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     requireAdmin(request);
-    const db = getDb();
+    const db = await getDb();
     const body = await readJson(request);
     const input = readServiceInput(body, getSettings(db).currency);
     return json({ service: createService(db, input) }, { status: 201 });
@@ -65,7 +65,7 @@ export async function POST(request: Request) {
 export async function PATCH(request: Request) {
   try {
     requireAdmin(request);
-    const db = getDb();
+    const db = await getDb();
     const body = await readJson(request);
     const id = stringField(body, "id", { required: true, max: 100 });
     if (!id) throw new AppError("MISSING_ID", "Service id is required.");
@@ -82,7 +82,7 @@ export async function DELETE(request: Request) {
     const body = await readJson(request);
     const id = stringField(body, "id", { required: true, max: 100 });
     if (!id) throw new AppError("MISSING_ID", "Service id is required.");
-    deactivateService(getDb(), id);
+    deactivateService(await getDb(), id);
     return json({ ok: true });
   } catch (error) {
     return routeError(error);

@@ -11,7 +11,7 @@ export async function GET(
   context: { params: Promise<{ code: string }> },
 ) {
   const { code } = await context.params;
-  const db = getDb();
+  const db = await getDb();
   const appointment = getAppointmentByCode(db, code.toUpperCase());
   if (!appointment) {
     return new Response("Appointment not found.", { status: 404 });

@@ -1,5 +1,5 @@
 import type { Db } from "@/lib/db/client";
-import { getDb, newId, nowIso, withTransaction } from "@/lib/db/client";
+import { newId, nowIso, withTransaction } from "@/lib/db/client";
 import {
   appointmentSummary,
   getAppointmentByCode,

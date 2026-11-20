@@ -12,7 +12,7 @@ export async function POST(request: Request) {
     const body = await readJson(request);
     const phone = stringField(body, "phone", { required: true, max: 30 });
     const code = stringField(body, "code", { max: 40 });
-    const db = getDb();
+    const db = await getDb();
     const settings = getSettings(db);
     const appointments = lookupAppointments(db, { phone: phone ?? "", code });
     return json({

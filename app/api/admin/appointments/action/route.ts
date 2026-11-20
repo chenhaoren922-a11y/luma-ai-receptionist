@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     const action = stringField(body, "action", { required: true, max: 20 });
     if (!id || !action) throw new AppError("MISSING_FIELDS", "id and action are required.");
 
-    const db = getDb();
+    const db = await getDb();
     const settings = getSettings(db);
     const appointment = adminAppointmentById(db, id);
     const provider = await getGoogleCalendarProvider(db);

@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
   try {
     requireAdmin(request);
-    return json({ settings: getSettings(getDb()) });
+    return json({ settings: getSettings(await getDb()) });
   } catch (error) {
     return routeError(error);
   }
@@ -24,7 +24,7 @@ export async function PUT(request: Request) {
     if (!body || typeof body !== "object") {
       throw new AppError("INVALID_SETTINGS", "Settings must be a JSON object.");
     }
-    const settings = saveSettings(body as Partial<BusinessSettings>, getDb());
+    const settings = saveSettings(body as Partial<BusinessSettings>, await getDb());
     return json({ settings });
   } catch (error) {
     return routeError(error);

@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { zodToJsonSchema } from "zod-to-json-schema";
 
 import type { Db } from "@/lib/db/client";
 import {
@@ -144,7 +143,7 @@ export const TOOL_DEFINITIONS: ModelToolDefinition[] = (
 ).map((name) => {
   // Groq validates tool arguments strictly. Use the standard JSON Schema
   // output so optional properties are not marked as required.
-  const generated = zodToJsonSchema(schemas[name]) as Record<string, unknown>;
+  const generated = z.toJSONSchema(schemas[name], { target: "draft-7" }) as Record<string, unknown>;
   delete generated.$schema;
   return {
     type: "function",

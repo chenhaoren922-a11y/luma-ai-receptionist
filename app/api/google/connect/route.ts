@@ -16,7 +16,7 @@ export async function GET(request: Request) {
     requireAdmin(request);
     if (!isGoogleConfigured()) {
       return NextResponse.redirect(
-        new URL("/admin?google=not_configured", request.url),
+        new URL("/admin?google=not_configured", process.env.APP_URL || request.url),
       );
     }
     const state = randomBytes(24).toString("base64url");

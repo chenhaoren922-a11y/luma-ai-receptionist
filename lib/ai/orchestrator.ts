@@ -51,7 +51,7 @@ export async function handleChat(input: {
   sessionId?: string;
   message: string;
 }): Promise<ChatResponse> {
-  const db = input.db ?? getDb();
+  const db = input.db ?? (await getDb());
   const message = input.message.trim();
   if (!message) {
     throw new AppError("EMPTY_MESSAGE", "Please type a message.");

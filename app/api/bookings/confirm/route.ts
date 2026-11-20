@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     const body = await readJson(request);
     const draftId = stringField(body, "draftId", { required: true, max: 100 });
     if (!draftId) throw new AppError("MISSING_DRAFT", "A draftId is required.");
-    const db = getDb();
+    const db = await getDb();
     const draftRow = db
       .prepare("SELECT conversation_id, status FROM booking_drafts WHERE id = ?")
       .get(draftId) as { conversation_id: string; status: string } | undefined;

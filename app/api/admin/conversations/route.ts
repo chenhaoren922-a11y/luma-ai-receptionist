@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
   try {
     requireAdmin(request);
-    const db = getDb();
+    const db = await getDb();
     const id = new URL(request.url).searchParams.get("id")?.trim();
     if (id) {
       return json(getConversationDetail(db, id));

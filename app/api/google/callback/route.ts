@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 const STATE_COOKIE = "luma_google_state";
 
 function errorRedirect(request: Request, message: string): NextResponse {
-  const url = new URL("/admin", request.url);
+  const url = new URL("/admin", process.env.APP_URL || request.url);
   url.searchParams.set("google", "error");
   url.searchParams.set("message", message.slice(0, 300));
   return NextResponse.redirect(url);
@@ -35,7 +35,7 @@ export async function GET(request: Request) {
 
   try {
     await exchangeCode(code);
-    const response = NextResponse.redirect(new URL("/admin?google=connected", request.url));
+    const response = NextResponse.redirect(new URL("/admin?google=connected", process.env.APP_URL || request.url));
     response.headers.append("Set-Cookie", `${STATE_COOKIE}=; Path=/; Max-Age=0`);
     return response;
   } catch (errorValue) {
