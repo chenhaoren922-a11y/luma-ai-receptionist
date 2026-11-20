@@ -1,3 +1,4 @@
+import { withNetlifyDatabase } from "@/lib/db/netlify";
 import { getDb } from "@/lib/db/client";
 import { getAppointmentByCode } from "@/lib/data/appointments";
 import { getSettings } from "@/lib/data/settings";
@@ -6,7 +7,7 @@ import { buildIcs } from "@/lib/domain/ics";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export async function GET(
+async function handleGET(
   _request: Request,
   context: { params: Promise<{ code: string }> },
 ) {
@@ -30,3 +31,5 @@ export async function GET(
     },
   });
 }
+
+export const GET = withNetlifyDatabase(handleGET);

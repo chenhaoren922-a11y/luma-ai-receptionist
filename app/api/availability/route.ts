@@ -1,3 +1,4 @@
+import { withNetlifyDatabase } from "@/lib/db/netlify";
 import { getDb } from "@/lib/db/client";
 import { checkRateLimit, clientIp } from "@/lib/auth/rate-limit";
 import { getGoogleCalendarProvider } from "@/lib/calendar/google";
@@ -8,7 +9,7 @@ import { json, routeError } from "@/lib/http";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export async function GET(request: Request) {
+async function handleGET(request: Request) {
   try {
     const ip = clientIp(request);
     const limit = checkRateLimit(`availability:${ip}`, 60, 60_000);
@@ -42,3 +43,5 @@ export async function GET(request: Request) {
     return routeError(error);
   }
 }
+
+export const GET = withNetlifyDatabase(handleGET, true);

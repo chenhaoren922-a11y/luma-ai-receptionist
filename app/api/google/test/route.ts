@@ -1,3 +1,4 @@
+import { withNetlifyDatabase } from "@/lib/db/netlify";
 import { requireAdmin } from "@/lib/auth/admin";
 import { getDb } from "@/lib/db/client";
 import { getGoogleCalendarProvider } from "@/lib/calendar/google";
@@ -7,7 +8,7 @@ import { json, routeError } from "@/lib/http";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export async function POST(request: Request) {
+async function handlePOST(request: Request) {
   try {
     requireAdmin(request);
     const provider = await getGoogleCalendarProvider(await getDb());
@@ -24,3 +25,5 @@ export async function POST(request: Request) {
     return routeError(error);
   }
 }
+
+export const POST = withNetlifyDatabase(handlePOST, true);

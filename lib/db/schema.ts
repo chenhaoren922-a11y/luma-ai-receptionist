@@ -1,4 +1,9 @@
 export const SCHEMA_SQL = `
+CREATE TABLE IF NOT EXISTS private_credentials (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS settings (
   key TEXT PRIMARY KEY,
   value TEXT NOT NULL

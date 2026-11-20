@@ -1,3 +1,4 @@
+import { withNetlifyDatabase } from "@/lib/db/netlify";
 import { requireAdmin } from "@/lib/auth/admin";
 import { getDb } from "@/lib/db/client";
 import {
@@ -36,7 +37,7 @@ function readFaqInput(body: unknown): FaqInput {
   };
 }
 
-export async function GET(request: Request) {
+async function handleGET(request: Request) {
   try {
     requireAdmin(request);
     return json({ faqs: getFaqs(await getDb(), false) });
@@ -45,7 +46,7 @@ export async function GET(request: Request) {
   }
 }
 
-export async function POST(request: Request) {
+async function handlePOST(request: Request) {
   try {
     requireAdmin(request);
     const db = await getDb();
@@ -56,7 +57,7 @@ export async function POST(request: Request) {
   }
 }
 
-export async function PATCH(request: Request) {
+async function handlePATCH(request: Request) {
   try {
     requireAdmin(request);
     const db = await getDb();
@@ -69,7 +70,7 @@ export async function PATCH(request: Request) {
   }
 }
 
-export async function DELETE(request: Request) {
+async function handleDELETE(request: Request) {
   try {
     requireAdmin(request);
     const body = await readJson(request);
@@ -81,3 +82,8 @@ export async function DELETE(request: Request) {
     return routeError(error);
   }
 }
+
+export const GET = withNetlifyDatabase(handleGET);
+export const POST = withNetlifyDatabase(handlePOST, true);
+export const PATCH = withNetlifyDatabase(handlePATCH, true);
+export const DELETE = withNetlifyDatabase(handleDELETE, true);

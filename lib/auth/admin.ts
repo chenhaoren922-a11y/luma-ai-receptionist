@@ -36,7 +36,7 @@ export function createAdminCookie(): string {
   const payload = String(expires);
   const value = `${payload}.${sign(payload)}`;
   const secure =
-    process.env.NODE_ENV === "production" && (process.env.APP_URL ?? "").startsWith("https://");
+    process.env.NODE_ENV === "production" && (process.env.APP_URL ?? process.env.URL ?? "").startsWith("https://");
   return `${ADMIN_COOKIE}=${value}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${SESSION_SECONDS}${
     secure ? "; Secure" : ""
   }`;

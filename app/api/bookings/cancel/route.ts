@@ -1,3 +1,4 @@
+import { withNetlifyDatabase } from "@/lib/db/netlify";
 import { getDb } from "@/lib/db/client";
 import { appointmentSummary } from "@/lib/data/appointments";
 import {
@@ -13,7 +14,7 @@ import { json, readJson, routeError, stringField } from "@/lib/http";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export async function POST(request: Request) {
+async function handlePOST(request: Request) {
   try {
     const body = await readJson(request);
     const code = stringField(body, "code", { required: true, max: 40 });
@@ -71,3 +72,5 @@ export async function POST(request: Request) {
     return routeError(error);
   }
 }
+
+export const POST = withNetlifyDatabase(handlePOST, true);

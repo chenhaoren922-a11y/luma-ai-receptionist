@@ -1,3 +1,4 @@
+import { withNetlifyDatabase } from "@/lib/db/netlify";
 import { requireAdmin } from "@/lib/auth/admin";
 import { getDb } from "@/lib/db/client";
 import { getConversationDetail } from "@/lib/data/admin";
@@ -7,7 +8,7 @@ import { json, routeError } from "@/lib/http";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export async function GET(request: Request) {
+async function handleGET(request: Request) {
   try {
     requireAdmin(request);
     const db = await getDb();
@@ -20,3 +21,5 @@ export async function GET(request: Request) {
     return routeError(error);
   }
 }
+
+export const GET = withNetlifyDatabase(handleGET);

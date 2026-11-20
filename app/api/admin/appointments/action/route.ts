@@ -1,3 +1,4 @@
+import { withNetlifyDatabase } from "@/lib/db/netlify";
 import { requireAdmin } from "@/lib/auth/admin";
 import { getDb } from "@/lib/db/client";
 import { adminAppointmentById } from "@/lib/data/admin";
@@ -11,7 +12,7 @@ import { json, readJson, routeError, stringField } from "@/lib/http";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export async function POST(request: Request) {
+async function handlePOST(request: Request) {
   try {
     requireAdmin(request);
     const body = await readJson(request);
@@ -53,3 +54,5 @@ export async function POST(request: Request) {
     return routeError(error);
   }
 }
+
+export const POST = withNetlifyDatabase(handlePOST, true);

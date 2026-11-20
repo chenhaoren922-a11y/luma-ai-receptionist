@@ -1,3 +1,4 @@
+import { withNetlifyDatabase } from "@/lib/db/netlify";
 import { NextResponse } from "next/server";
 
 import { getDb } from "@/lib/db/client";
@@ -6,7 +7,7 @@ import { getSettings } from "@/lib/data/settings";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+async function handleGET() {
   try {
     const db = await getDb();
     const settings = getSettings(db);
@@ -22,3 +23,5 @@ export async function GET() {
     return NextResponse.json({ ok: false }, { status: 500 });
   }
 }
+
+export const GET = withNetlifyDatabase(handleGET);

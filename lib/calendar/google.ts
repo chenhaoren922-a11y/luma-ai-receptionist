@@ -3,6 +3,7 @@ import path from "node:path";
 import { google } from "googleapis";
 
 import type { Db } from "@/lib/db/client";
+import { requestDatabase } from "@/lib/db/scope";
 import { getSettings } from "@/lib/data/settings";
 import { AppError } from "@/lib/errors";
 import type {
@@ -32,7 +33,7 @@ export function isGoogleConfigured(): boolean {
 export function getRedirectUri(): string {
   return (
     process.env.GOOGLE_REDIRECT_URI ||
-    `${process.env.APP_URL || "http://localhost:3000"}/api/google/callback`
+    `${process.env.APP_URL || process.env.URL || "http://localhost:3000"}/api/google/callback`
   );
 }
 
@@ -63,8 +64,12 @@ export function getAuthUrl(state: string): string {
 
 export function readGoogleToken(): StoredGoogleToken | null {
   try {
-    if (!fs.existsSync(TOKEN_PATH)) return null;
-    const raw = fs.readFileSync(TOKEN_PATH, "utf8");
+    const db = requestDatabase();
+    const row = db?.prepare("SELECT value FROM private_credentials WHERE key = 'google'").get();
+    const raw = db
+      ? (typeof row?.value === "string" ? row.value : null)
+      : fs.existsSync(TOKEN_PATH) ? fs.readFileSync(TOKEN_PATH, "utf8") : null;
+    if (!raw) return null;
     const parsed = JSON.parse(raw) as StoredGoogleToken;
     return parsed.refresh_token || parsed.access_token ? parsed : null;
   } catch {
@@ -77,6 +82,11 @@ export function hasGoogleToken(): boolean {
 }
 
 export function saveGoogleToken(token: StoredGoogleToken): void {
+  const db = requestDatabase();
+  if (db) {
+    db.prepare("INSERT OR REPLACE INTO private_credentials(key, value) VALUES ('google', ?)").run(JSON.stringify(token));
+    return;
+  }
   fs.mkdirSync(path.dirname(TOKEN_PATH), { recursive: true });
   fs.writeFileSync(TOKEN_PATH, JSON.stringify(token, null, 2), {
     encoding: "utf8",
@@ -86,6 +96,11 @@ export function saveGoogleToken(token: StoredGoogleToken): void {
 
 export function clearGoogleToken(): void {
   try {
+    const db = requestDatabase();
+    if (db) {
+      db.prepare("DELETE FROM private_credentials WHERE key = 'google'").run();
+      return;
+    }
     if (fs.existsSync(TOKEN_PATH)) fs.unlinkSync(TOKEN_PATH);
   } catch {
     // Ignore cleanup failures; the UI will still report a disconnected state.

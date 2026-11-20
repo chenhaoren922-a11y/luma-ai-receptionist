@@ -1,3 +1,4 @@
+import { withNetlifyDatabase } from "@/lib/db/netlify";
 import { checkRateLimit, clientIp } from "@/lib/auth/rate-limit";
 import { handleChat } from "@/lib/ai/orchestrator";
 import { json, readJson, routeError, stringField } from "@/lib/http";
@@ -5,7 +6,7 @@ import { json, readJson, routeError, stringField } from "@/lib/http";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export async function POST(request: Request) {
+async function handlePOST(request: Request) {
   try {
     const ip = clientIp(request);
     const limit = checkRateLimit(`chat:${ip}`, 30, 60_000);
@@ -36,3 +37,5 @@ export async function POST(request: Request) {
     return routeError(error);
   }
 }
+
+export const POST = withNetlifyDatabase(handlePOST, true);

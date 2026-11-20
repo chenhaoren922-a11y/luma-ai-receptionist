@@ -18,3 +18,9 @@ Bolt hosting supports Next.js server rendering. This version can publish the Nex
 The project can also run entirely on the persistent Node.js host. Keep `LUMA_BACKEND_URL` unset and set `APP_URL` and the OAuth callback to that host's public URL.
 
 [Bolt publishing documentation](https://support.bolt.new/troubleshooting/publish-issues.md#contains-no-html-file-error)
+
+## Deploy directly on Netlify
+
+Netlify Functions use a private, site-wide Netlify Blobs store for the SQLite database, independently of the local and Bolt preview databases. The default build is npm run build. Leave LUMA_BACKEND_URL unset for this deployment mode. Set ADMIN_PASSWORD and SESSION_SECRET in Netlify before enabling admin access, and set APP_URL to the public site URL when configuring Google OAuth. Set SEED_DEMO=false before the first deployment if the site should start with empty records. Existing Blobs data is retained across redeploys and cold starts.
+
+This deployment serializes whole SQLite snapshot writes for a single studio. Use a dedicated database and backend for higher write throughput or isolated per-branch data.

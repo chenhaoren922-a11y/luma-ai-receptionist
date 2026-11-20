@@ -19,6 +19,7 @@
     "dev:bolt": "node scripts/dev-bolt.mjs"
   },
   "dependencies": {
+    "@netlify/blobs": "11.1.9",
     "chrono-node": "2.10.3",
     "date-fns": "4.4.0",
     "date-fns-tz": "3.2.0",

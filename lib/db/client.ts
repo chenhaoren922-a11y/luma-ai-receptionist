@@ -4,6 +4,7 @@ import type { DatabaseSync, SQLInputValue } from "node:sqlite";
 import type { Database } from "sql.js";
 import initSqlJs from "sql.js/dist/sql-asm.js";
 
+import { requestDatabase } from "./scope";
 import { SCHEMA_SQL } from "./schema";
 import { seedDatabase } from "./seed";
 import { newId, nowIso, tableCount } from "./utils";
@@ -78,6 +79,22 @@ function previewDatabase(database: Database): Db {
   };
 }
 
+export async function openPortableDatabase(data?: Uint8Array): Promise<Db & { snapshot(): ArrayBuffer }> {
+  const sqlite = await initSqlJs();
+  const database = new sqlite.Database(data);
+  const db = previewDatabase(database);
+  try {
+    initializeDatabase(db, { seed: !data });
+    return {
+      ...db,
+      snapshot: () => Uint8Array.from(database.export()).buffer,
+    };
+  } catch (error) {
+    db.close();
+    throw error;
+  }
+}
+
 async function createDatabase(): Promise<Db> {
   if (process.env.LUMA_BOLT_PREVIEW === "1" && process.env.NODE_ENV === "development") {
     const sqlite = await initSqlJs();
@@ -89,6 +106,8 @@ async function createDatabase(): Promise<Db> {
 const globalForDb = globalThis as typeof globalThis & { __lumaDb?: Promise<Db> };
 
 export function getDb(): Promise<Db> {
+  const requestDb = requestDatabase();
+  if (requestDb) return Promise.resolve(requestDb);
   globalForDb.__lumaDb ??= createDatabase().catch((error) => {
     delete globalForDb.__lumaDb;
     throw error;

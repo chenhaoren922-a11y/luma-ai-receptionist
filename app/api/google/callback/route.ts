@@ -1,3 +1,4 @@
+import { withNetlifyDatabase } from "@/lib/db/netlify";
 import { timingSafeEqual } from "node:crypto";
 
 import { NextResponse } from "next/server";
@@ -11,13 +12,13 @@ export const dynamic = "force-dynamic";
 const STATE_COOKIE = "luma_google_state";
 
 function errorRedirect(request: Request, message: string): NextResponse {
-  const url = new URL("/admin", process.env.APP_URL || request.url);
+  const url = new URL("/admin", process.env.APP_URL || process.env.URL || request.url);
   url.searchParams.set("google", "error");
   url.searchParams.set("message", message.slice(0, 300));
   return NextResponse.redirect(url);
 }
 
-export async function GET(request: Request) {
+async function handleGET(request: Request) {
   const url = new URL(request.url);
   const error = url.searchParams.get("error");
   if (error) return errorRedirect(request, "Google authorization was cancelled.");
@@ -35,7 +36,7 @@ export async function GET(request: Request) {
 
   try {
     await exchangeCode(code);
-    const response = NextResponse.redirect(new URL("/admin?google=connected", process.env.APP_URL || request.url));
+    const response = NextResponse.redirect(new URL("/admin?google=connected", process.env.APP_URL || process.env.URL || request.url));
     response.headers.append("Set-Cookie", `${STATE_COOKIE}=; Path=/; Max-Age=0`);
     return response;
   } catch (errorValue) {
@@ -44,3 +45,5 @@ export async function GET(request: Request) {
     return errorRedirect(request, message);
   }
 }
+
+export const GET = withNetlifyDatabase(handleGET, true);
