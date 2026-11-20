@@ -16,7 +16,26 @@ function useNetlifyStorage() {
 }
 
 function storage() {
-  return getStore({ name: "luma-sqlite", consistency: "strong" });
+  return getStore({
+    name: "luma-sqlite",
+    consistency: "strong",
+    fetch: async (input, init) => {
+      try {
+        const response = await fetch(input, {
+          ...init,
+          cache: "no-store",
+          signal: AbortSignal.timeout(4000),
+        });
+        if (response.status < 500 && response.status !== 429) return response;
+        console.error("[sqlite storage]", init?.method, "HTTP", response.status);
+        await response.body?.cancel();
+      } catch (error) {
+        console.error("[sqlite storage]", init?.method, error instanceof Error ? error.name : "fetch failed");
+      }
+      // Let the request fail promptly rather than exhausting the function's execution time in SDK retries.
+      return new Response("Storage is temporarily unavailable.", { status: 400 });
+    },
+  });
 }
 
 async function read(store: ReturnType<typeof storage>) {
@@ -42,6 +61,7 @@ async function load(store: ReturnType<typeof storage>) {
   const db = await openPortableDatabase();
   try {
     await store.set(databaseKey, versioned(new Uint8Array(db.snapshot())), { onlyIfNew: true });
+    console.info("[sqlite storage] initial snapshot submitted");
   } finally {
     db.close();
   }
